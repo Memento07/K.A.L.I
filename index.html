@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050502">
+<title>K.A.L.I. — Archivio Ω</title>
+<style>
+:root {
+  --gold:#d8b45b; --gold2:#f0d081; --line:#6d5a2a; --dark:#050603;
+  --panel:#0b0d08; --panel2:#11140d; --green:#78a658; --red:#bb5b4d;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#020302;color:var(--gold);font-family:"Courier New",monospace}
+body{padding:12px;background:
+radial-gradient(circle at 50% 15%,rgba(132,96,28,.12),transparent 35%),
+linear-gradient(#020302,#070804 60%,#020302)}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.012) 0 1px,transparent 2px 4px);z-index:20}
+button,input{font:inherit}
+.shell{max-width:1180px;min-height:calc(100vh - 24px);margin:auto;border:1px solid #5d4b24;background:#080904;box-shadow:0 0 50px #000;position:relative;overflow:hidden}
+.appbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:linear-gradient(#191b12,#0e100a);border-bottom:1px solid #6d5a2a;box-shadow:inset 0 1px rgba(255,255,255,.04)}
+.appbar-left{display:flex;align-items:center;gap:10px}
+.mini-logo{width:34px;height:34px;object-fit:contain}
+.app-title{font-size:.92rem;color:var(--gold2);letter-spacing:.08em}
+.app-meta{font-size:.68rem;color:#9b803e;text-align:right;line-height:1.45}
+.screen{display:none;min-height:720px}
+.screen.active{display:block}
+.login{display:grid;place-items:center;padding:30px 18px;text-align:center}
+.login-card{width:min(680px,96%);border:1px solid #625027;background:linear-gradient(180deg,#0d0f09,#070804);padding:28px;box-shadow:inset 0 0 35px rgba(216,180,91,.03)}
+.main-logo{width:min(390px,78vw);display:block;margin:0 auto -4px;filter:drop-shadow(0 0 12px rgba(216,180,91,.22))}
+.org{font-family:Georgia,serif;color:#ecd080;letter-spacing:.16em;text-transform:uppercase;font-size:clamp(1rem,3vw,1.7rem)}
+.sep{height:1px;background:linear-gradient(90deg,transparent,#7d652e,transparent);margin:20px 0}
+.login h1{font-weight:normal;letter-spacing:.22em;color:#c9a350;font-size:clamp(1.1rem,3vw,1.7rem)}
+.sub{color:#8d7338;font-size:.83rem;line-height:1.6}
+.field{max-width:520px;margin:24px auto 0;text-align:left}
+.field label{display:block;font-size:.74rem;margin-bottom:8px;color:#c29b47}
+input{width:100%;padding:15px;border:1px solid #66532a;background:#030402;color:#f0cf78;outline:none;letter-spacing:.16em}
+input:focus{border-color:#d9b75f;box-shadow:0 0 0 2px rgba(216,180,91,.06)}
+.primary,.small-btn{border:1px solid #6c5728;background:linear-gradient(#17190f,#0c0e08);color:#e4c16a;cursor:pointer}
+.primary{margin-top:20px;padding:13px 24px;min-width:280px}
+.primary:hover,.small-btn:hover{background:#1b1f12}
+.msg{min-height:24px;margin-top:14px;font-size:.78rem}
+.error{color:var(--red)}
+.loading{display:grid;place-items:center;padding:30px}
+.boot{width:min(650px,100%)}
+.boot h2{text-align:center;letter-spacing:.18em;color:var(--gold2);font-weight:normal}
+.lines{min-height:200px;line-height:1.9;color:#b49448}
+.bar{height:9px;border:1px solid #6b572d}
+.fill{height:100%;width:0;background:#d8b45b;transition:width 3.4s ease}
+.percent{font-size:.72rem;color:#8d7338;margin-top:8px}
+.workspace{display:grid;grid-template-columns:245px 1fr;min-height:720px;background:#070804}
+.sidebar{border-right:1px solid #5f4e26;background:linear-gradient(180deg,#11130d,#080904);padding:14px}
+.sidebar-title{font-size:.7rem;color:#8f7437;margin-bottom:10px;letter-spacing:.12em}
+.tree{display:flex;flex-direction:column;gap:5px}
+.tree button{text-align:left;width:100%;padding:11px 10px;border:1px solid transparent;background:transparent;color:#b99648;cursor:pointer}
+.tree button:hover,.tree button.active{border-color:#5f4d25;background:#17190f;color:#ebc96f}
+.tree .indent{padding-left:26px}
+.mainpane{padding:14px;background:#0a0c07}
+.window{border:1px solid #66542a;background:#0d1009;min-height:665px;box-shadow:inset 0 0 30px rgba(216,180,91,.025)}
+.window-title{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:linear-gradient(#1b1e14,#10120c);border-bottom:1px solid #655329;color:#e1bf66;font-size:.78rem}
+.toolbar{display:flex;gap:7px;padding:8px;border-bottom:1px solid #4e401f;background:#0b0d08}
+.small-btn{padding:7px 10px;font-size:.68rem}
+.content{padding:16px}
+.home-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.folder{border:1px solid #5e4c24;background:linear-gradient(145deg,#16180f,#0a0c07);padding:20px;min-height:170px;cursor:pointer;color:inherit;text-align:left}
+.folder:hover{border-color:#d4ad53;transform:translateY(-2px)}
+.folder-ico{font-size:2rem;margin-bottom:18px}
+.folder-name{color:#edca72;letter-spacing:.07em}
+.folder-desc{font-size:.72rem;color:#8c7136;line-height:1.55;margin-top:8px}
+.list-head,.file-row{display:grid;grid-template-columns:145px 1fr 120px 110px;gap:12px;align-items:center}
+.list-head{padding:9px 10px;border:1px solid #50401f;background:#11130c;color:#8f7539;font-size:.66rem}
+.file-row{padding:14px 10px;border-bottom:1px solid #403519;cursor:pointer}
+.file-row:hover{background:#15180f}
+.file-code{color:#e6c36c;font-size:.78rem}
+.file-title{font-size:.82rem;color:#c8a653}
+.file-sub{font-size:.66rem;color:#77622f;margin-top:4px}
+.status{font-size:.65rem;color:var(--green)}
+.priority{color:#e6bf54}
+.viewer{display:none}
+.viewer.active{display:block}
+.evidence-layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:16px}
+.image-panel{border:1px solid #51421f;background:#050603;padding:10px;display:grid;place-items:center}
+.image-panel img{max-width:100%;max-height:650px;object-fit:contain;display:block}
+.info-panel{border:1px solid #51421f;background:#0b0d08}
+.info-section{padding:14px;border-bottom:1px solid #403519}
+.info-section:last-child{border-bottom:0}
+.info-title{font-size:.69rem;letter-spacing:.12em;color:#8f7539;margin-bottom:10px}
+.meta-grid{display:grid;grid-template-columns:110px 1fr;gap:8px 12px;font-size:.73rem;line-height:1.5}
+.meta-grid div:nth-child(odd){color:#806a34}
+.note{font-size:.77rem;line-height:1.75;color:#bea04f}
+.nav-evidence{display:flex;justify-content:space-between;gap:10px;margin-top:14px}
+.nav-evidence button{flex:1}
+.footerline{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;border-top:1px solid #51421f;background:#090a06;color:#77622e;font-size:.65rem}
+@media(max-width:820px){
+  body{padding:0} .shell{min-height:100vh;border-left:0;border-right:0}
+  .workspace{grid-template-columns:1fr} .sidebar{border-right:0;border-bottom:1px solid #5f4e26}
+  .tree{display:grid;grid-template-columns:repeat(3,1fr)} .tree button{text-align:center;padding:10px 6px}
+  .tree .indent{padding-left:6px} .home-grid{grid-template-columns:1fr}
+  .list-head{display:none} .file-row{grid-template-columns:1fr auto} .file-row>div:nth-child(2){grid-column:1}
+  .file-row>div:nth-child(3),.file-row>div:nth-child(4){grid-row:1} .evidence-layout{grid-template-columns:1fr}
+  .app-meta{display:none}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="appbar">
+    <div class="appbar-left">
+      <img class="mini-logo" src="assets/images/kali-logo.png" alt="">
+      <div class="app-title">K.A.L.I. ARCHIVE CLIENT // NODE Ω–07</div>
+    </div>
+    <div class="app-meta">SEDE: BARI, ITALIA<br>CLASSIFICAZIONE: OMEGA</div>
+  </div>
+
+  <section id="login" class="screen active login">
+    <div class="login-card">
+      <img class="main-logo" src="assets/images/kali-logo.png" alt="K.A.L.I.">
+      <div class="org">Cooperazione Anti-Loop Italiana</div>
+      <div class="sep"></div>
+      <h1>ACCESSO RISERVATO</h1>
+      <div class="sub">Inserire la chiave assegnata all’archivista autorizzato.</div>
+      <div class="field">
+        <label for="pwd">CHIAVE DI ACCESSO</label>
+        <input id="pwd" type="password" autocomplete="off" placeholder="•••••">
+      </div>
+      <button class="primary" id="loginBtn">AUTENTICA IDENTITÀ</button>
+      <div class="msg" id="msg"></div>
+    </div>
+  </section>
+
+  <section id="loading" class="screen loading">
+    <div class="boot">
+      <h2>ACCESSO AUTORIZZATO</h2>
+      <div class="lines" id="bootLines"></div>
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <div class="percent" id="percent">SINCRONIZZAZIONE: 0%</div>
+    </div>
+  </section>
+
+  <section id="archive" class="screen">
+    <div class="workspace">
+      <aside class="sidebar">
+        <div class="sidebar-title">RISORSE ARCHIVIO</div>
+        <div class="tree">
+          <button class="active" data-view="home">▣ ARCHIVIO Ω</button>
+          <button class="indent" data-view="screens">▤ SCREENSHOT</button>
+          <button class="indent" data-view="videos">▶ VIDEO DELLA TELECAMERA</button>
+          <button class="indent" data-view="audio">◉ REGISTRAZIONI</button>
+        </div>
+      </aside>
+
+      <main class="mainpane">
+        <div class="window">
+          <div class="window-title">
+            <span id="windowTitle">Archivio Ω</span>
+            <span>UTENTE: ARCHIVISTA // STATO: CONNESSO</span>
+          </div>
+          <div class="toolbar">
+            <button class="small-btn" id="homeBtn">HOME</button>
+            <button class="small-btn" id="backBtn">INDIETRO</button>
+            <button class="small-btn" id="logoutBtn">TERMINA SESSIONE</button>
+          </div>
+          <div class="content">
+            <div id="homeView">
+              <div class="home-grid">
+                <button class="folder" data-open="screens">
+                  <div class="folder-ico">▤</div>
+                  <div class="folder-name">SCREENSHOT</div>
+                  <div class="folder-desc">5 reperti digitali verificati e ordinati cronologicamente.</div>
+                </button>
+                <button class="folder" data-open="videos">
+                  <div class="folder-ico">▶</div>
+                  <div class="folder-name">VIDEO DELLA TELECAMERA</div>
+                  <div class="folder-desc">Area predisposta per i filmati CCTV.</div>
+                </button>
+                <button class="folder" data-open="audio">
+                  <div class="folder-ico">◉</div>
+                  <div class="folder-name">REGISTRAZIONI</div>
+                  <div class="folder-desc">2 comunicazioni vocali acquisite, verificate e indicizzate.</div>
+                </button>
+              </div>
+            </div>
+
+            <div id="screensView" style="display:none">
+              <div class="list-head"><div>CODICE</div><div>DESCRIZIONE</div><div>DATA</div><div>STATO</div></div>
+              <div id="screenList"></div>
+            </div>
+
+            <div id="videosView" style="display:none">
+<div class="list-head"><div>CODICE</div><div>DESCRIZIONE</div><div>DURATA</div><div>STATO</div></div>
+<div id="videoList"><div class="file-row video-row" data-video-index="0">
+<div class="file-code">VID-2024-001</div>
+<div><div class="file-title">Anomalia nel corridoio</div><div class="file-sub">Filmato di sorveglianza acquisito e indicizzato</div></div>
+<div class="file-sub">00:08</div>
+<div class="status ">VERIFICATO</div>
+</div><div class="file-row video-row" data-video-index="1">
+<div class="file-code">VID-2024-002</div>
+<div><div class="file-title">Ingresso del professore</div><div class="file-sub">Filmato di sorveglianza acquisito e indicizzato</div></div>
+<div class="file-sub">00:06</div>
+<div class="status priority">PRIORITÀ ALTA</div>
+</div><div class="file-row video-row" data-video-index="2">
+<div class="file-code">VID-2024-003</div>
+<div><div class="file-title">Recupero dei reperti K.A.L.I.</div><div class="file-sub">Filmato di sorveglianza acquisito e indicizzato</div></div>
+<div class="file-sub">00:07</div>
+<div class="status ">VERIFICATO</div>
+</div></div>
+</div>
+
+<div id="videoViewerView" class="viewer">
+<div class="evidence-layout">
+<div class="image-panel" id="videoMediaPanel"></div>
+<div class="info-panel">
+<div class="info-section"><div class="info-title">IDENTIFICATIVO REPERTO</div><div id="videoCode" style="font-size:1rem;color:#edca72"></div><div id="videoTitle" style="margin-top:6px;color:#9b803e;font-size:.78rem"></div></div>
+<div class="info-section"><div class="info-title">METADATI</div><div class="meta-grid">
+<div>ORIGINE</div><div id="videoCamera"></div><div>POSIZIONE</div><div id="videoLocation"></div><div>DATA</div><div id="videoDate"></div><div>DURATA</div><div id="videoDuration"></div><div>CLASSIFICAZIONE</div><div id="videoStatus"></div>
+</div></div>
+<div class="info-section"><div class="info-title">OSSERVAZIONE DELL’ARCHIVISTA</div><div class="note" id="videoNote"></div></div>
+<div class="info-section"><div class="nav-evidence"><button class="small-btn" id="prevVideoBtn">◄ PRECEDENTE</button><button class="small-btn" id="nextVideoBtn">SUCCESSIVO ►</button></div></div>
+</div></div></div>
+
+            <div id="audioView" style="display:none">
+              <div class="list-head"><div>CODICE</div><div>DESCRIZIONE</div><div>DURATA</div><div>STATO</div></div>
+              <div id="audioList">
+                <div class="file-row audio-row" data-audio-index="0">
+                  <div class="file-code">REG-2024-001</div>
+                  <div><div class="file-title">Messaggio al Soggetto R.C.</div><div class="file-sub">Comunicazione riservata indirizzata direttamente a Rosa Calia</div></div>
+                  <div class="file-sub">01:07</div>
+                  <div class="status">DESECRETATO</div>
+                </div>
+                <div class="file-row audio-row" data-audio-index="1">
+                  <div class="file-code">REG-2024-002</div>
+                  <div><div class="file-title">Rapporto sulle Testimonianze</div><div class="file-sub">Rapporto interno redatto da un membro della K.A.L.I.</div></div>
+                  <div class="file-sub">00:57</div>
+                  <div class="status priority">ACCESSO LIMITATO</div>
+                </div>
+              </div>
+            </div>
+
+            <div id="audioViewerView" class="viewer">
+              <div class="evidence-layout">
+                <div class="image-panel" style="min-height:360px">
+                  <div style="width:min(620px,100%);text-align:center">
+                    <div style="border:1px solid #66542a;background:#090b07;padding:18px;margin-bottom:22px;text-align:left;line-height:1.8;color:#a98a42;font-size:.72rem">
+                      <div style="color:#edca72;letter-spacing:.12em">ARCHIVIO AUDIO K.A.L.I.</div>
+                      <div>FORMATO ORIGINALE PRESERVATO</div>
+                      <div>TRASCRIZIONE: NON DISPONIBILE</div>
+                      <div>INTEGRITÀ DEL REPERTO: VERIFICATA ✓</div>
+                    </div>
+                    <div style="font-size:3.2rem;margin:8px 0 18px">◉</div>
+                    <audio id="audioPlayer" controls preload="none" style="width:100%"></audio>
+                    <div style="margin-top:14px;color:#806a34;font-size:.68rem;letter-spacing:.1em">▶ AVVIA RIPRODUZIONE DEL REPERTO</div>
+                  </div>
+                </div>
+                <div class="info-panel">
+                  <div class="info-section"><div class="info-title">IDENTIFICATIVO REPERTO</div><div id="audioCode" style="font-size:1rem;color:#edca72"></div><div id="audioTitle" style="margin-top:6px;color:#9b803e;font-size:.78rem"></div></div>
+                  <div class="info-section"><div class="info-title">METADATI</div><div class="meta-grid">
+                    <div>TIPO</div><div id="audioType"></div><div>EMITTENTE</div><div id="audioSender"></div><div>DESTINATARIO</div><div id="audioRecipient"></div><div>DURATA</div><div id="audioDuration"></div><div>CLASSIFICAZIONE</div><div id="audioStatus"></div><div>INTEGRITÀ</div><div>100%</div>
+                  </div></div>
+                  <div class="info-section"><div class="info-title">NOTA D’ARCHIVIO</div><div class="note" id="audioNote"></div></div>
+                  <div class="info-section"><div class="nav-evidence"><button class="small-btn" id="prevAudioBtn">◄ PRECEDENTE</button><button class="small-btn" id="nextAudioBtn">SUCCESSIVO ►</button></div></div>
+                </div>
+              </div>
+            </div>
+
+            <div id="viewerView" class="viewer">
+              <div class="evidence-layout">
+                <div class="image-panel"><img id="evidenceImg" alt="Reperto digitale"></div>
+                <div class="info-panel">
+                  <div class="info-section">
+                    <div class="info-title">IDENTIFICATIVO REPERTO</div>
+                    <div id="evidenceCode" style="font-size:1rem;color:#edca72"></div>
+                    <div id="evidenceTitle" style="margin-top:6px;color:#9b803e;font-size:.78rem"></div>
+                  </div>
+                  <div class="info-section">
+                    <div class="info-title">METADATI</div>
+                    <div class="meta-grid">
+                      <div>ORIGINE</div><div>Dispositivo mobile recuperato</div>
+                      <div>DATA</div><div id="evidenceDate"></div>
+                      <div>CLASSIFICAZIONE</div><div id="evidenceClass"></div>
+                      <div>INTEGRITÀ</div><div id="evidenceIntegrity"></div>
+                    </div>
+                  </div>
+                  <div class="info-section">
+                    <div class="info-title">OSSERVAZIONE DELL’ARCHIVISTA</div>
+                    <div class="note" id="evidenceNote"></div>
+                  </div>
+                  <div class="info-section">
+                    <div class="nav-evidence">
+                      <button class="small-btn" id="prevBtn">◄ PRECEDENTE</button>
+                      <button class="small-btn" id="nextBtn">SUCCESSIVO ►</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="footerline">
+            <span>K.A.L.I. // ARCHIVE CLIENT v4.1</span>
+            <span>PROTOCOLLO 07–Ω // DIFFUSIONE VIETATA</span>
+          </div>
+        </div>
+      </main>
+    </div>
+  </section>
+</div>
+
+<script>
+
+const surveillanceVideos = [{"code":"VID-2024-001","title":"Anomalia nel corridoio","mime":"video/mp4","camera":"Telecamera C-14","location":"Corridoio universitario — Ala Est","duration":"00:08","status":"VERIFICATO","note":"Una sequenza anomala mostra più soggetti attraversare ripetutamente lo stesso tratto del corridoio. Non risultano interruzioni né alterazioni evidenti del flusso video.","date":"DATA RISERVATA","src":"assets/video/vid-2024-001.mp4"},{"code":"VID-2024-002","title":"Ingresso del professore","mime":"image/gif","camera":"Telecamera C-09","location":"Corridoio adiacente all’aula Ω","duration":"00:06","status":"PRIORITÀ ALTA","note":"Il soggetto si arresta davanti all’aula, rivolge lo sguardo verso il dispositivo di sorveglianza e successivamente entra. Non è stata registrata alcuna uscita.","date":"DATA RISERVATA","src":"assets/video/vid-2024-002.gif"},{"code":"VID-2024-003","title":"Recupero dei reperti K.A.L.I.","mime":"image/gif","camera":"Telecamera C-21","location":"Corridoio — Settore testimonianze","duration":"00:07","status":"VERIFICATO","note":"Tre operatori K.A.L.I. recuperano i messaggi lasciati dai soggetti coinvolti nel ciclo. L’operazione avviene senza comunicazioni verbali registrate.","date":"DATA RISERVATA","src":"assets/video/vid-2024-003.gif"}];
+let currentVideo = 0;
+function openVideo(i){
+  currentVideo=i; const v=surveillanceVideos[i];
+  const panel=document.getElementById("videoMediaPanel");
+  panel.innerHTML="";
+  if(v.mime==="video/mp4"){
+    const el=document.createElement("video"); el.controls=true; el.loop=true; el.playsInline=true; el.autoplay=true; el.muted=true;
+    el.style.maxWidth="100%"; el.style.maxHeight="650px"; el.preload="metadata"; el.src=v.src; panel.appendChild(el); el.play().catch(()=>{});
+  } else {
+    const el=document.createElement("img"); el.alt=v.title; el.style.maxWidth="100%"; el.style.maxHeight="650px"; el.preload="metadata"; el.src=v.src; panel.appendChild(el);
+  }
+  document.getElementById("videoCode").textContent=v.code; document.getElementById("videoTitle").textContent=v.title;
+  document.getElementById("videoCamera").textContent=v.camera; document.getElementById("videoLocation").textContent=v.location;
+  document.getElementById("videoDate").textContent=v.date; document.getElementById("videoDuration").textContent=v.duration;
+  document.getElementById("videoStatus").textContent=v.status; document.getElementById("videoNote").textContent=v.note; showView("videoViewer");
+}
+document.querySelectorAll(".video-row").forEach(r=>r.onclick=()=>openVideo(Number(r.dataset.videoIndex)));
+document.getElementById("prevVideoBtn").onclick=()=>openVideo((currentVideo-1+surveillanceVideos.length)%surveillanceVideos.length);
+document.getElementById("nextVideoBtn").onclick=()=>openVideo((currentVideo+1)%surveillanceVideos.length);
+
+
+const audioEvidence = [{"code":"REG-2024-001","title":"Messaggio al Soggetto R.C.","type":"Comunicazione riservata","sender":"Membro K.A.L.I. — identità riservata","recipient":"Rosa Calia — Soggetto R.C.","duration":"01:07","status":"ACCESSO LIMITATO","note":"Comunicazione diretta emessa per il soggetto R.C. dopo la ricostruzione dei reperti del dossier. Il contenuto costituisce il primo riconoscimento ufficiale dell’indagine da parte della K.A.L.I.","mime":"audio/mpeg","src":"assets/audio/reg-2024-001.mp3"},{"code":"REG-2024-002","title":"Rapporto sulle Testimonianze","type":"Rapporto interno","sender":"Membro K.A.L.I. — identità riservata","recipient":"Archivio interno","duration":"00:57","status":"DESECRETATO","note":"Analisi delle testimonianze raccolte dalla Cooperazione Anti-Loop Italiana. La registrazione evidenzia gli elementi ricorrenti riscontrati nei casi riconducibili al Loop Ω.","mime":"audio/mpeg","src":"assets/audio/reg-2024-002.mp3"}];
+let currentAudio=0;
+function openAudio(i){
+  currentAudio=i; const a=audioEvidence[i];
+  const player=document.getElementById("audioPlayer");
+  player.pause(); player.preload="none"; player.src=a.src; player.load();
+  document.getElementById("audioCode").textContent=a.code;
+  document.getElementById("audioTitle").textContent=a.title;
+  document.getElementById("audioType").textContent=a.type;
+  document.getElementById("audioSender").textContent=a.sender;
+  document.getElementById("audioRecipient").textContent=a.recipient;
+  document.getElementById("audioDuration").textContent=a.duration;
+  document.getElementById("audioStatus").textContent=a.status;
+  document.getElementById("audioNote").textContent=a.note;
+  showView("audioViewer");
+}
+document.querySelectorAll(".audio-row").forEach(r=>r.onclick=()=>openAudio(Number(r.dataset.audioIndex)));
+document.getElementById("prevAudioBtn").onclick=()=>openAudio((currentAudio-1+audioEvidence.length)%audioEvidence.length);
+document.getElementById("nextAudioBtn").onclick=()=>openAudio((currentAudio+1)%audioEvidence.length);
+
+const evidence = [{"code":"IMG-2009-0612-A","title":"Archivio Testimonianze","date":"12 giugno 2009","class":"VERIFICATO","integrity":"100%","note":"Prima testimonianza nota nella quale un soggetto comprende di non essere l’unico coinvolto nell’anomalia temporale. La frase “Non sei il primo” compare successivamente in più casi indipendenti.","src":"assets/images/img-2009-0612-a.jpg"},{"code":"IMG-2013-0427-A","title":"Ultimi nel Ciclo","date":"27 aprile 2013","class":"VERIFICATO","integrity":"100%","note":"Prima menzione documentata di un archivio dedicato ai fenomeni del Loop. Il soggetto riferisce dell’esistenza di una raccolta di fascicoli, diagrammi e casi precedenti.","src":"assets/images/img-2013-0427-a.jpg"},{"code":"IMG-2015-1103-A","title":"Loop Ω – Ricerche","date":"3 novembre 2015","class":"VERIFICATO","integrity":"99,8%","note":"Prima comparsa dell’espressione Loop Ω. Il reperto suggerisce l’esistenza di incontri clandestini tra individui a conoscenza del fenomeno e conferma la raccolta sistematica delle testimonianze.","src":"assets/images/img-2015-1103-a.jpg"},{"code":"IMG-2021-1007-A","title":"Fenomeni Anomali","date":"7 ottobre 2021","class":"VERIFICATO","integrity":"100%","note":"Il contenuto conferma che il fenomeno è studiato da decenni e che il nome Loop Ω è ormai diffuso tra diversi gruppi indipendenti.","src":"assets/images/img-2021-1007-a.jpg"},{"code":"IMG-2022-0315-A","title":"Archivio K.A.L.I.","date":"15 marzo 2022","class":"PRIORITÀ ALTA","integrity":"100%","note":"Prima testimonianza in cui compare per esteso il nome Cooperazione Anti-Loop Italiana. Il reperto conferma che l’organizzazione preserva il materiale destinato a chi riuscirà a interrompere il ciclo.","src":"assets/images/img-2022-0315-a.jpg"}];
+const login = document.getElementById("login");
+const loading = document.getElementById("loading");
+const archive = document.getElementById("archive");
+const pwd = document.getElementById("pwd");
+const msg = document.getElementById("msg");
+let currentView = "home";
+let currentEvidence = 0;
+
+function showScreen(el){
+  [login,loading,archive].forEach(x=>x.classList.remove("active"));
+  el.classList.add("active");
+}
+function authenticate(){
+  if(pwd.value.trim().toUpperCase()!=="OMEGA"){
+    msg.textContent="ACCESSO NEGATO // CHIAVE NON VALIDA";
+    msg.className="msg error";
+    pwd.select(); return;
+  }
+  msg.textContent="";
+  showScreen(loading);
+  const lines=["Verifica credenziali livello OMEGA...","Connessione al nodo Ω–07...","Decrittazione indice reperti...","Montaggio archivio screenshot...","Verifica integrità file..."];
+  const box=document.getElementById("bootLines"); box.innerHTML="";
+  lines.forEach((t,i)=>setTimeout(()=>{const d=document.createElement("div");d.textContent="> "+t;box.appendChild(d)},i*420));
+  setTimeout(()=>document.getElementById("fill").style.width="100%",200);
+  let p=0; const timer=setInterval(()=>{p=Math.min(100,p+7);document.getElementById("percent").textContent="SINCRONIZZAZIONE: "+p+"%";if(p>=100)clearInterval(timer)},180);
+  setTimeout(()=>{showScreen(archive);showView("home")},3400);
+}
+document.getElementById("loginBtn").onclick=authenticate;
+pwd.addEventListener("keydown",e=>{if(e.key==="Enter")authenticate()});
+
+const views={
+  home:document.getElementById("homeView"),
+  screens:document.getElementById("screensView"),
+  videos:document.getElementById("videosView"),
+  videoViewer:document.getElementById("videoViewerView"),
+  audio:document.getElementById("audioView"),
+  audioViewer:document.getElementById("audioViewerView"),
+  viewer:document.getElementById("viewerView")
+};
+function showView(name){
+  Object.values(views).forEach(v=>{v.style.display="none";v.classList.remove("active")});
+  if(name==="viewer"){views.viewer.style.display="block";views.viewer.classList.add("active")}
+  else if(name==="videoViewer"){views.videoViewer.style.display="block";views.videoViewer.classList.add("active")}
+  else if(name==="audioViewer"){views.audioViewer.style.display="block";views.audioViewer.classList.add("active")}
+  else views[name].style.display="block";
+  currentView=name;
+  document.getElementById("windowTitle").textContent={
+    home:"Archivio Ω",
+    screens:"Screenshot // Reperti digitali",
+    videos:"Video della telecamera // CCTV",
+    audio:"Registrazioni // Archivio audio",
+    viewer:"Visualizzatore reperti K.A.L.I.",
+    videoViewer:"Visualizzatore filmati K.A.L.I.",
+    audioViewer:"Visualizzatore registrazioni K.A.L.I."
+  }[name];
+  document.querySelectorAll(".tree button").forEach(b=>b.classList.toggle("active",b.dataset.view===name || (name==="viewer"&&b.dataset.view==="screens") || (name==="videoViewer"&&b.dataset.view==="videos") || (name==="audioViewer"&&b.dataset.view==="audio")));
+}
+document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>showView(b.dataset.view));
+document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>showView(b.dataset.open));
+document.getElementById("homeBtn").onclick=()=>showView("home");
+document.getElementById("backBtn").onclick=()=>showView(currentView==="viewer"?"screens":currentView==="videoViewer"?"videos":currentView==="audioViewer"?"audio":"home");
+document.getElementById("logoutBtn").onclick=()=>{pwd.value="";showScreen(login)};
+
+const list=document.getElementById("screenList");
+evidence.forEach((e,i)=>{
+  const row=document.createElement("div");
+  row.className="file-row";
+  row.innerHTML=`<div class="file-code">${e.code}</div>
+  <div><div class="file-title">${e.title}</div><div class="file-sub">Reperto immagine recuperato e indicizzato</div></div>
+  <div class="file-sub">${e.date}</div>
+  <div class="status ${e.class.includes("PRIORITÀ")?"priority":""}">${e.class}</div>`;
+  row.onclick=()=>openEvidence(i);
+  list.appendChild(row);
+});
+function openEvidence(i){
+  currentEvidence=i;
+  const e=evidence[i];
+  document.getElementById("evidenceImg").src=e.src;
+  document.getElementById("evidenceCode").textContent=e.code;
+  document.getElementById("evidenceTitle").textContent=e.title;
+  document.getElementById("evidenceDate").textContent=e.date;
+  document.getElementById("evidenceClass").textContent=e.class;
+  document.getElementById("evidenceIntegrity").textContent=e.integrity;
+  document.getElementById("evidenceNote").textContent=e.note;
+  showView("viewer");
+}
+document.getElementById("prevBtn").onclick=()=>openEvidence((currentEvidence-1+evidence.length)%evidence.length);
+document.getElementById("nextBtn").onclick=()=>openEvidence((currentEvidence+1)%evidence.length);
+</script>
+</body>
+</html>
